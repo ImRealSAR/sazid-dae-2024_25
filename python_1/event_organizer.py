@@ -1,7 +1,7 @@
 import random
 import math
 def validateMonth(month):
-    while month < 1 or month > 12:
+    while month < 1 and month != float(month) or month > 12 and month != float(month) :
         month = int(input("Invalid month. Please enter value from 1-12: "))
     return month
 

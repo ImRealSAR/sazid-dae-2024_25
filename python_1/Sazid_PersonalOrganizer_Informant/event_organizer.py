@@ -18,13 +18,11 @@ def validateDay(month, day, year):
     while day < 1 or day > days_in_month[month - 1]:
         day = int(input(f"Invalid day. Please enter value from 1-{days_in_month[month - 1]}: "))
     return day
-# Event
-# Date: Month Day, Year
 def printEvents():
     month_names = ["January", "February", "March", "April", "May", "June", 
                    "July", "August", "September", "October", "November", "December"]
     print("\n******************** List of Events ********************")
-    for i in range(len(eventName)):
+    for event_index in range(len(eventName)):
         print(f"Event: {eventName[i]}")
         print(f"Date: {month_names[eventMonth[i] - 1]} {eventDay[i]}, {eventYear[i]}\n")
 

@@ -40,6 +40,10 @@ def main():
                 break  # Exit the loop after successful generation
         except ValueError:
             print("Invalid input. Please enter an integer for the password length.")
+        else:
+            print("Password generation and saving to file were successful.")  # This will run if no exception occurs
+        finally:
+            print("Exiting password generation process.")  # This will always execute, regardless of exceptions
 
 # Main call
 if __name__ == "__main__":

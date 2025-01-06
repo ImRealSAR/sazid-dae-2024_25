@@ -1,21 +1,21 @@
 import React, { useState } from "react";
-import Header from "./header";
-import Footer from "./footer";
-import Greeting from "./wsg";
-import Logo from "./image";
+import Header from "./Header";
+import Footer from "./Footer";
+import Greeting from "./Greeting";
+import Logo from "./Logo";
 
 function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <div>
+    <div style={{ textAlign: "center", padding: "20px" }}>
       <Header />
       <Logo />
-      <Greeting message="Hello" />
-      <p style={{ textAlign: "center" }}>
-        Count: {count}{" "}
+      <Greeting message="Hello, welcome to Sazid's DAE AI Project!" />
+      <div style={{ margin: "20px 0" }}>
+        <p>Count: {count}</p>
         <button onClick={() => setCount(count + 1)}>Increase Count</button>
-      </p>
+      </div>
       <Footer />
     </div>
   );

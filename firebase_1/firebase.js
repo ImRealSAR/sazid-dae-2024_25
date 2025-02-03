@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,6 +19,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app); // Initialize Firebase Storage
+const db = getFirestore(app); // Initialize Firestore
 
 // Function to log message to console and display as an alert
 function logAndAlert(message) {
@@ -83,6 +85,59 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadFile(file).then((url) => {
                 logAndAlert('File uploaded successfully. Download URL: ' + url);
             });
+        }
+    });
+
+    // Firestore Create Document
+    document.getElementById('createDocument')?.addEventListener('click', async () => {
+        const docId = document.getElementById('docId').value;
+        const data = { name: "Sample Name", description: "Sample Description" };
+        try {
+            await setDoc(doc(db, "collectionName", docId), data);
+            logAndAlert('Document created successfully.');
+        } catch (error) {
+            logAndAlert('Error creating document: ' + error.message);
+        }
+    });
+
+    // Firestore Read Document
+    document.getElementById('readDocument')?.addEventListener('click', async () => {
+        const docId = document.getElementById('docId').value;
+        try {
+            const docRef = doc(db, "collectionName", docId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                logAndAlert('Document data: ' + JSON.stringify(docSnap.data()));
+            } else {
+                logAndAlert('No such document!');
+            }
+        } catch (error) {
+            logAndAlert('Error reading document: ' + error.message);
+        }
+    });
+
+    // Firestore Update Document
+    document.getElementById('updateDocument')?.addEventListener('click', async () => {
+        const docId = document.getElementById('docId').value;
+        const updatedData = { description: "Updated Description" };
+        try {
+            const docRef = doc(db, "collectionName", docId);
+            await updateDoc(docRef, updatedData);
+            logAndAlert('Document updated successfully.');
+        } catch (error) {
+            logAndAlert('Error updating document: ' + error.message);
+        }
+    });
+
+    // Firestore Delete Document
+    document.getElementById('deleteDocument')?.addEventListener('click', async () => {
+        const docId = document.getElementById('docId').value;
+        try {
+            const docRef = doc(db, "collectionName", docId);
+            await deleteDoc(docRef);
+            logAndAlert('Document deleted successfully.');
+        } catch (error) {
+            logAndAlert('Error deleting document: ' + error.message);
         }
     });
 });

@@ -2,24 +2,38 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import axios from 'axios';
+import MessageBubble from './MessageBubble'; // Import the new component
 
-// Project Initialization: React Native app setup with Expo
+const API_KEY = 'AIzaSyDDmL8Nw6Bc3nKQJMhWqjwSZI1O3qZjYTE';
+const API_URL = 'https://api.gemini.com/v1/chat'; // Adjust based on Gemini's actual API endpoint
 
-// UI Components: ChatScreen component to handle user messages
 const ChatScreen = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // State Management: Using useState to manage chat messages dynamically
   const sendMessage = async () => {
     if (input.trim() === '') return;
     const userMessage = { id: messages.length, text: input, sender: 'user' };
     setMessages([...messages, userMessage]);
     setInput('');
+    setLoading(true);
 
-    // API Integration: Mock API response for AI-generated reply
-    const aiMessage = { id: messages.length + 1, text: 'AI Response', sender: 'ai' };
-    setTimeout(() => setMessages([...messages, userMessage, aiMessage]), 1000);
+    try {
+      const response = await axios.post(
+        API_URL,
+        { message: input },
+        { headers: { Authorization: `Bearer ${API_KEY}` } }
+      );
+
+      const aiMessage = { id: messages.length + 1, text: response.data.reply, sender: 'ai' };
+      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+    } catch (error) {
+      console.error('Error fetching AI response:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,17 +41,14 @@ const ChatScreen = () => {
       <FlatList
         data={messages}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <Text style={item.sender === 'user' ? styles.userText : styles.aiText}>{item.text}</Text>
-        )}
+        renderItem={({ item }) => <MessageBubble text={item.text} sender={item.sender} />}
       />
       <TextInput style={styles.input} value={input} onChangeText={setInput} placeholder='Type a message' />
-      <Button title='Send' onPress={sendMessage} />
+      <Button title={loading ? 'Thinking...' : 'Send'} onPress={sendMessage} disabled={loading} />
     </View>
   );
 };
 
-// Navigation: HomeScreen component with navigation to ChatScreen
 const HomeScreen = ({ navigation }) => (
   <View style={styles.container}>
     <Text>Welcome to the AI Chatbot!</Text>
@@ -47,7 +58,6 @@ const HomeScreen = ({ navigation }) => (
 
 const Stack = createStackNavigator();
 
-// Navigation: Setting up stack navigator for multiple screens
 export default function App() {
   return (
     <NavigationContainer>
@@ -59,10 +69,8 @@ export default function App() {
   );
 }
 
-// Styling: Applying styles to make UI visually appealing
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center' },
   input: { borderWidth: 1, width: '80%', padding: 10, margin: 10 },
-  userText: { alignSelf: 'flex-end', backgroundColor: '#ADD8E6', padding: 5, margin: 5 },
-  aiText: { alignSelf: 'flex-start', backgroundColor: '#D3D3D3', padding: 5, margin: 5 },
 });
+

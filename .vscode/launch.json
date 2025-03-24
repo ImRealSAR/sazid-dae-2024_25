@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Run ai_key.py",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/ai_api_Integration_2/ai_key.py",
+        "console": "integratedTerminal",
+        "python": "${workspaceFolder}/myenv/Scripts/python.exe"
+      }
+    ]
+  }
+  

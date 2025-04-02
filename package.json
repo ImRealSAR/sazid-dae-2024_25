@@ -2,5 +2,9 @@
   "dependencies": {
     "axios": "^1.8.1",
     "expo": "^52.0.38"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/react": "~18.3.12"
   }
 }

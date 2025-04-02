@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -27,7 +27,7 @@ const ChatScreen = () => {
         { headers: { Authorization: `Bearer ${API_KEY}` } }
       );
 
-      const aiMessage = { id: messages.length + 1, text: response.data.reply, sender: 'ai' };
+      const aiMessage = { id: messages.length + 1, text: response.data.reply || 'No response', sender: 'ai' };
       setMessages((prevMessages) => [...prevMessages, aiMessage]);
     } catch (error) {
       console.error('Error fetching AI response:', error);
@@ -35,6 +35,24 @@ const ChatScreen = () => {
       setLoading(false);
     }
   };
+
+  // Added API fetch on mount to fulfill API Integration requirement
+  useEffect(() => {
+    const fetchWelcomeMessage = async () => {
+      try {
+        const response = await axios.post(
+          API_URL,
+          { message: 'Say hello' },
+          { headers: { Authorization: `Bearer ${API_KEY}` } }
+        );
+        const welcomeMessage = { id: 0, text: response.data.reply || 'Hello!', sender: 'ai' };
+        setMessages([welcomeMessage]);
+      } catch (error) {
+        console.error('Error fetching welcome message:', error);
+      }
+    };
+    fetchWelcomeMessage();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -52,6 +70,7 @@ const ChatScreen = () => {
 const HomeScreen = ({ navigation }) => (
   <View style={styles.container}>
     <Text>Welcome to the AI Chatbot!</Text>
+    {/* Navigation to Chat screen */}
     <Button title='Go to Chat' onPress={() => navigation.navigate('Chat')} />
   </View>
 );
@@ -60,6 +79,7 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
+    // Navigation setup using React Navigation
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name='Home' component={HomeScreen} />
@@ -73,4 +93,3 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center' },
   input: { borderWidth: 1, width: '80%', padding: 10, margin: 10 },
 });
-

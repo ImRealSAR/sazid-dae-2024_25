@@ -1,3 +1,23 @@
+"""
+🛠 HOW TO RUN THIS DJANGO AI PROJECT IN VS CODE (STEP BY STEP)
+
+1. Open VS Code and navigate to this project folder.
+2. (Optional but recommended) Create a virtual environment:
+     python -m venv venv
+     source venv/bin/activate  (or venv\Scripts\activate on Windows)
+
+3. Install required packages:
+     pip install django google-generativeai requests
+
+4. Run the script directly (auto starts server in a thread):
+     python <filename>.py
+
+   - It will launch http://127.0.0.1:8000/ in your browser.
+   - You can also POST to http://127.0.0.1:8000/generate/ using:
+     Basic Auth: admin / securepassword
+     JSON Body: { "prompt": "your question here" }
+    - The response will be the generated text from the Gemini API.
+"""
 import os
 import sys
 import threading
@@ -88,16 +108,14 @@ urlpatterns = [
 
 # --- Run Django Server in Thread ---
 def run_django():
-    from django.core.servers.basehttp import run
-    application = get_wsgi_application()
-    run("127.0.0.1", 8000, application)
+    execute_from_command_line(["manage.py", "runserver"])
 
 django_thread = threading.Thread(target=run_django, daemon=True)
 django_thread.start()
 import webbrowser
 webbrowser.open("http://127.0.0.1:8000/")
 
-# --- GUI Functionality (Tkinter) ---
+# --- (not using) GUI Functionality (Tkinter) ---
 # def generate_content():
 #     user_input = input_text.get("1.0", tk.END).strip()
 #     if not user_input:

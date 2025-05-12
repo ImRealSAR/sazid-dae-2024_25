@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Generate</title>
+  <link rel="stylesheet" href="{% static 'myapp/style.css' %}" />
+</head>
+<body>
+<header>
+    <nav>
+        <div class="logo">AI Project</div>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/generate-ai/">Generate</a></li>
+            <li><a href="/chat-history/">Chat History</a></li>
+            <li><a href="/feedback/">Feedback</a></li>
+            <li><a href="/login/">Login</a></li>
+        </ul>
+    </nav>
+</header>
+<main class="content-section">
+  <h1>Generate Content with AI</h1>
+  <form method="post">
+    {% csrf_token %}
+    <label for="model">Choose a model:</label>
+    <select name="model" id="model">
+      <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+      <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+      <option value="other-api">OpenAI GPT-4</option>
+    </select>
+    <br><br>
+    <textarea name="prompt" rows="6" style="width:100%; font-size:1.2em;" placeholder="Enter a prompt...">{{ prompt }}</textarea>
+    <br><br>
+    <button type="submit" class="cta-button">Generate</button>
+  </form>
+
+  {% if response %}
+    <div class="content-section visible" style="margin-top: 2em;">
+      <h2>AI Response:</h2>
+      <pre style="white-space: pre-wrap;">{{ response }}</pre>
+    </div>
+  {% endif %}
+</main>
+</body>
+</html>

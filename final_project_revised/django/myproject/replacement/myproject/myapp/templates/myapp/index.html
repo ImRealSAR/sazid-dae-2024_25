@@ -1,1 +1,24 @@
-[REPLACE_ME_WITH_ACTUAL_INDEX_HTML]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Generator</title>
+  <link rel="stylesheet" href="{% static 'myapp/style.css' %}" />
+</head>
+<body>
+  <div class="container">
+    <h1>AI Text Generator</h1>
+    <form id="aiForm">
+      <textarea id="prompt" placeholder="Enter your prompt..."></textarea>
+      <button type="submit">Generate</button>
+    </form>
+    <div id="outputContainer">
+      <h2>Generated Response:</h2>
+      <pre id="output"></pre>
+    </div>
+  </div>
+
+  <script src="{% static 'myapp/script.js' %}"></script>
+</body>
+</html>

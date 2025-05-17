@@ -1,102 +1,44 @@
 {% load static %}
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My AI Project</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Chat History</title>
+  <link rel="stylesheet" href="{% static 'myapp/style.css' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<header>
-    <nav>
-        <div class="logo">AI Project</div>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/generate-ai/">Generate</a></li>
-            <li><a href="/chat-history/">Chat History</a></li>
-            <li><a href="/feedback/">Feedback</a></li>
-            <li><a href="/login/">Login</a></li>
-        </ul>
-        <button id="theme-toggle" aria-label="Toggle theme">
-            <!-- SVG icons -->
-        </button>
+  <header class="site-header">
+    <nav class="navbar">
+      <div class="logo">AI Project</div>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/generate-ai/">Generate</a></li>
+        <li><a href="/chat-history/">Chat History</a></li>
+        <li><a href="/feedback/">Feedback</a></li>
+        <li><a href="/login/">Login</a></li>
+        <li><a href="/signup/">Sign Up</a></li>
+
+      </ul>
+      <button id="theme-toggle" class="cta-button">🌓</button>
     </nav>
-</header>
-<main>
-    <header>
-        <nav>
-            <div class="logo">AI Project</div>
-            <ul>
-                <li><a href="#hero">Home</a></li>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#about">About</a></li>
-            </ul>
-            <button id="theme-toggle" aria-label="Toggle theme">
-                <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                    <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.106a.75.75 0 0 1 1.06-1.06l1.591 1.591a.75.75 0 1 1-1.06 1.06l-1.591-1.591ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5h2.25a.75.75 0 0 1 .75.75ZM17.894 17.894a.75.75 0 0 1 1.06 1.06l-1.591 1.591a.75.75 0 1 1-1.06-1.06l1.591-1.591ZM12 18.75a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75ZM5.106 17.894a.75.75 0 0 1 1.06-1.06l1.591 1.591a.75.75 0 0 1-1.06 1.06l-1.591-1.591ZM2.25 12a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5H3a.75.75 0 0 1-.75-.75ZM6.106 5.106a.75.75 0 0 1 1.06 1.06l-1.591 1.591a.75.75 0 0 1-1.06-1.06l1.591-1.591Z"/>
-                </svg>
-                <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="display: none;">
-                    <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69a.75.75 0 0 1 .981.981A10.503 10.503 0 0 1 18 19.5a10.5 10.5 0 0 1-10.5-10.5 10.503 10.503 0 0 1 2.028-6.282.75.75 0 0 1 .819-.162Z" clip-rule="evenodd"/>
-                </svg>
-            </button>
-        </nav>
-    </header>
+  </header>
 
-    <main>
-        <section id="hero" class="hero-section full-height">
-            <div class="content">
-                <h1>Ensure Academic Integrity with AI</h1>
-                <p>Leveraging advanced AI to detect and prevent plagiarism.</p>
-                <a href="#features" class="cta-button">Learn How</a>
-            </div>
-             <div class="scroll-indicator">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5" />
-                </svg>
-             </div>
-        </section>
+  <main class="content-section narrow">
+    <h1>Your AI Chat History</h1>
+    {% if history %}
+      {% for entry in history %}
+        <div class="chat-entry">
+          <p><strong>You:</strong> {{ entry.prompt }}</p>
+          <p><strong>AI:</strong> {{ entry.response }}</p>
+          <hr>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No previous chats found.</p>
+    {% endif %}
+  </main>
 
-        <section id="features" class="content-section">
-            <h2>Features</h2>
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="feature-icon">
-                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                    </svg>
-                    <h3>Accurate Detection</h3>
-                    <p>Identifies potential plagiarism with high precision.</p>
-                </div>
-                <div class="feature-item">
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="feature-icon">
-                       <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                     </svg>
-                    <h3>Comprehensive Analysis</h3>
-                    <p>Analyzes text against vast online sources and databases.</p>
-                </div>
-                <div class="feature-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="feature-icon">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L1.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L22.75 5.25l-.813 2.846a4.5 4.5 0 0 0 3.09 3.09L21.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09L15.25 18.75l.813-2.846a4.5 4.5 0 0 0-3.09-3.09L9.75 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L18.25 5.25Z" />
-                    </svg>
-                    <h3>Intelligent</h3>
-                    <p>Powered by state-of-the-art machine learning models.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="about" class="content-section">
-            <h2>About Us</h2>
-            <p>We are dedicated to upholding academic integrity by developing advanced AI tools to combat plagiarism and ensure originality in submitted work. Our system utilizes leading AI models to provide reliable detection services.</p>
-            </section>
-
-    </main>
-
-    <footer>
-        <p>&copy; 2024 AI Project. All rights reserved.</p>
-    </footer>
-
-    <script src="script.js"></script>
-</main></body>
+  <script src="{% static 'myapp/script.js' %}"></script>
+</body>
 </html>

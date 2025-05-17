@@ -11,3 +11,16 @@ yarn-error.log*
 
 # Optional: dotenv files
 .env
+
+# Keep secrets safe
+.env
+
+# Django defaults
+__pycache__/
+*.pyc
+db.sqlite3
+
+# VS Code / Mac / OS stuff
+.vscode/
+.DS_Store
+

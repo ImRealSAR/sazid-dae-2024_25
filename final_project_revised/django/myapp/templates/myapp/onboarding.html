@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customize Your AI</title>
+  <link rel="stylesheet" href="{% static 'myapp/style.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar">
+      <div class="logo">AI Project</div>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/generate-ai/">Generate</a></li>
+        <li><a href="/chat-history/">Chat History</a></li>
+        <li><a href="/feedback/">Feedback</a></li>
+        <li><a href="/login/">Login</a></li>
+        <li><a href="/signup/">Sign Up</a></li>
+        <li><a href="#" onclick="logout()">Logout</a></li>
+      </ul>
+      <button id="theme-toggle" class="cta-button">🌓</button>
+    </nav>
+  </header>
+
+  <main class="content-section narrow">
+    <h1>Customize Your AI Guide</h1>
+    <form id="onboarding-form">
+      <label for="aiName">What should your AI call itself?</label>
+      <input type="text" id="aiName" placeholder="e.g. Kairo, Nova, Senti..." required>
+
+      <label for="tone">What tone should your AI use?</label>
+      <select id="tone">
+        <option value="friendly">Friendly</option>
+        <option value="encouraging">Encouraging</option>
+        <option value="sarcastic">Sarcastic</option>
+        <option value="spiritual">Spiritual</option>
+        <option value="no-nonsense">No-nonsense</option>
+      </select>
+
+      <button type="submit" class="cta-button">Save Preferences</button>
+    </form>
+  </main>
+
+  <script type="module" src="{% static 'myapp/firebase.js' %}"></script>
+  <script>
+    function logout() {
+      import("https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js").then(({ getAuth, signOut }) => {
+        const auth = getAuth();
+        signOut(auth).then(() => {
+          alert("Logged out!");
+          window.location.href = "/";
+        });
+      });
+    }
+  </script>
+</body>
+</html>

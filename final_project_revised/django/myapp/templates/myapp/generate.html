@@ -10,17 +10,16 @@
 <body>
   <header class="site-header">
     <nav class="navbar">
-      <div class="logo">AI Project</div>
+      <div class="logo">Intelesense-- AI by SAR</div>
       <ul class="nav-links">
         <li><a href="/">Home</a></li>
         <li><a href="/generate-ai/">Generate</a></li>
         <li><a href="/chat-history/">Chat History</a></li>
         <li><a href="/feedback/">Feedback</a></li>
-        <li><a href="/login/">Login</a></li>
-        <li><a href="/signup/">Sign Up</a></li>
-
+        <li><a href="/account/">Settings</a></li>
+        <li><a href="{% url 'logout' %}">Log Out</a></li>
+        <li id="user-greeting" style="font-weight: bold; color: #90ee90;"></li>
       </ul>
-      <button id="theme-toggle" class="cta-button">🌓</button>
     </nav>
   </header>
 
@@ -32,16 +31,15 @@
 
       <label for="model">Choose a model:</label>
       <select name="model" id="model">
-        <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash (Free)</option>
-        <!-- <option value="other-api">OpenAI GPT-4</option> -->
+        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Free)</option>
+        <option value="openai-gpt4">OpenAI GPT-4</option>
       </select>
 
       <label for="prompt">Your prompt:</label>
       <textarea name="prompt" id="prompt" rows="6" placeholder="Ask me something smart...">{{ prompt }}</textarea>
 
-      <label for="file_input">Optional file:</label>
       <input type="file" name="file_input" id="file_input">
-
+      <input type="hidden" id="firebase-uid" name="firebase_uid">
       <button type="submit" class="cta-button">Generate</button>
     </form>
 
@@ -53,6 +51,40 @@
     {% endif %}
   </main>
 
-  <script src="{% static 'myapp/script.js' %}"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFnxD9pC691dV3QFwUUFhCyRr-FZmpHaw",
+      authDomain: "intelesense-sar.firebaseapp.com",
+      projectId: "intelesense-sar",
+      storageBucket: "intelesense-sar.appspot.com",
+      messagingSenderId: "149988638839",
+      appId: "1:149988638839:web:084070ed33754a233c0672"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      const uidField = document.getElementById("firebase-uid");
+      const greeting = document.getElementById("user-greeting");
+      if (user && uidField) {
+        uidField.value = user.uid;
+
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
+        const aiName = snap.exists() ? snap.data().ai_name || "Your AI" : "Your AI";
+        if (greeting) greeting.textContent = `Welcome, ${aiName}`;
+      } else {
+        if (greeting) {
+          greeting.innerHTML = `<a href="/login/">Login</a> / <a href="/signup/">Sign Up</a>`;
+        }
+      }
+    });
+  </script>
 </body>
 </html>

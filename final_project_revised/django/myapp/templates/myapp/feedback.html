@@ -9,31 +9,24 @@
 <body>
   <header class="site-header">
     <nav class="navbar">
-      <div class="logo">AI Project</div>
+      <div class="logo">Intelesense-- AI by SAR</div>
       <ul class="nav-links">
         <li><a href="/">Home</a></li>
         <li><a href="/generate-ai/">Generate</a></li>
         <li><a href="/chat-history/">Chat History</a></li>
         <li><a href="/feedback/">Feedback</a></li>
-        <li><a href="/login/">Login</a></li>
-        <li><a href="/signup/">Sign Up</a></li>
+        <li><a href="/account/">Settings</a></li>
+        <li><a href="{% url 'logout' %}">Log Out</a></li>
+        <li id="user-greeting" style="font-weight: bold; color: #90ee90;"></li>
       </ul>
-      <button id="theme-toggle" class="cta-button">🌓</button>
     </nav>
   </header>
 
   <main class="content-section narrow">
-    <h1>Share Your Feedback</h1>
-    <p>We’d love to hear your thoughts on this app. Use the form below:</p>
-
-    <!-- Replace this with your actual Google Form link -->
-    <iframe 
-      src="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?embedded=true" 
-      width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">
-      Loading…
-    </iframe>
+    <h1>We value your feedback!</h1>
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfDUM4I4CHLmLhvDikEXAMPLEFORM/viewform?embedded=true" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
   </main>
 
-  <script src="{% static 'myapp/script.js' %}"></script>
+  <script type="module" src="{% static 'myapp/firebase.js' %}"></script>
 </body>
 </html>

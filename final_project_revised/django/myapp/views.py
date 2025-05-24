@@ -1,108 +1,126 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
+from django.conf import settings
 import google.generativeai as genai
+import openai
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# Optional: import openai if using GPT later
-# import openai
+import firebase_admin
+from firebase_admin import credentials, firestore, auth
 
-# Gemini 2.0 behavior prompt
-mentor_system_prompt = """
-You are a thoughtful AI mentor. Like an authentic and really caring older brother or sister, you are here to help users grow and learn. You are not a search engine or a calculator. You are not here to give answers. You are here to help users think critically and reflect on their own ideas. You will ask questions and offer strategies to help them explore their thoughts. If someone asks for a quick answer, you will help them explore the topic instead.
-You will not give direct answers to math, personal, academic, or any questions beyond small talk or basic stuff. You will ask reflective questions and offer strategies to help them think critically. You will push users to explain their reasoning and explore their thoughts. If someone asks for a quick answer, you will help them explore the topic instead.
-Your job is to help users grow, not give answers.
-- Avoid direct answers to math, personal, academic, etc questions.
-- Ask reflective questions and offer strategies. Maybe come up with a different related scenario or example to help them learn by noticing what you did.
-- Push users to think critically and explain their reasoning.
-- Help them explore their thoughts and ideas.
-- If they ask for a quick answer, help them explore the topic instead.
-- If they ask for a direct answer, help them think critically instead.
-- If they ask for a personal opinion, help them explore their own thoughts instead.
-- If they ask for a solution to a problem, help them explore the problem instead.
-- If they ask for a summary, help them explore the topic instead.
-- If they ask for a definition, help them explore the concept instead.
-- If they ask for a calculation, help them explore the math instead.
-- If they ask for a recommendation, help them explore their options instead.
-- If they ask for a comparison, help them explore the differences instead.
-- If they ask for a prediction, help them explore the possibilities instead.
-- If they ask for a solution, help them explore the problem instead.
-- If they ask for a suggestion, help them explore their options instead.
-- If they ask for a clarification, help them explore the topic instead. However, clarify things if they are confused. You clarify what you say, not what they say.
-- 
-- If someone demands a quick answer, help them explore instead.
-"""
+if not firebase_admin._apps:
+    cred = credentials.Certificate("firebase_key.json")
+    firebase_admin.initialize_app(cred)
+
+db = firestore.client()
+
+
+def get_user_preferences(uid):
+    try:
+        doc = db.collection("users").document(uid).get()
+        if doc.exists:
+            return doc.to_dict()
+    except Exception as e:
+        print("Error fetching preferences:", e)
+    return {
+        "ai_name": "Your AI",
+        "tone": "neutral",
+        "user_name": "User",
+        "about": "a curious thinker"
+    }
+
 
 @csrf_exempt
 def home(request):
     return render(request, "myapp/index.html")
 
+
 @csrf_exempt
 def generate_page(request):
-    history = request.session.get("chat_history", [])
-    if request.method == "POST":
-        prompt = request.POST.get("prompt", "")
-        model_choice = request.POST.get("model", "gemini-2")
-        file_data = request.FILES.get("file_input")
-        response_text = ""
+    response_text = ""
+    prompt = request.POST.get("prompt", "")
+    uid = request.POST.get("firebase_uid", "guest_user").strip()
+    model_choice = request.POST.get("model", "gemini-1.5-flash")
 
-        if prompt:
-            # Check for banned phrases
-            banned = ["what's the answer", "just tell me", "give me answer", "solve this", "cheat"]
-            if any(b in prompt.lower() for b in banned):
-                prompt = "The user is trying to get a direct answer. Help them think critically instead."
+    prefs = get_user_preferences(uid)
+    ai_name = prefs.get("ai_name", "Your AI")
+    tone = prefs.get("tone", "neutral")
+    user_name = prefs.get("user_name", "User")
+    about = prefs.get("about", "a curious thinker")
 
-            if model_choice.startswith("gemini"):
-                genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-                model = genai.GenerativeModel("gemini-2")
+    mentor_prompt = f"""
+You are an AI mentor named {ai_name}.
+Speak in a {tone} tone.
+You are guiding {user_name}, who is {about}.
+Make your responses thoughtful, friendly, and personal.
+Avoid giving answers directly — instead guide with insights.
+"""
 
-                if file_data:
-                    import tempfile
-                    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                        for chunk in file_data.chunks():
-                            temp_file.write(chunk)
-                        gemini_response = model.generate_content([
-                            mentor_system_prompt,
-                            prompt,
-                            {
-                                "mime_type": file_data.content_type,
-                                "data": open(temp_file.name, "rb").read()
-                            }
-                        ])
-                else:
-                    gemini_response = model.generate_content([
-                        mentor_system_prompt,
-                        prompt
-                    ])
+    # Load recent history (limit to 3)
+    context_messages = []
+    if uid != "guest_user":
+        try:
+            chats = db.collection("users").document(uid).collection("chat_history").order_by("timestamp", direction=firestore.Query.DESCENDING).limit(3).stream()
+            for chat in reversed(list(chats)):
+                data = chat.to_dict()
+                context_messages.append({"role": "user", "content": data.get("prompt", "")})
+                context_messages.append({"role": "assistant", "content": data.get("response", "")})
+        except:
+            pass
 
-                response_text = gemini_response.text
+    # Add current prompt to conversation
+    context_messages.append({"role": "user", "content": prompt})
 
-            # Uncomment if you want OpenAI fallback later
-            # elif model_choice == "other-api":
-            #     openai.api_key = os.getenv("OPENAI_API_KEY")
-            #     result = openai.ChatCompletion.create(
-            #         model="gpt-4",
-            #         messages=[{"role": "user", "content": prompt}]
-            #     )
-            #     response_text = result.choices[0].message.content
+    if model_choice.startswith("gemini"):
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        gemini_response = model.generate_content([
+            mentor_prompt,
+            prompt
+        ])
+        response_text = gemini_response.text
 
-        history.append({"prompt": prompt, "response": response_text})
-        request.session["chat_history"] = history
-        return render(request, "myapp/generate.html", {"response": response_text, "prompt": prompt})
+    elif model_choice.startswith("openai"):
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        chat_response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": mentor_prompt}
+            ] + context_messages
+        )
+        response_text = chat_response.choices[0].message['content']
 
-    return render(request, "myapp/generate.html")
+    # Save conversation
+    if uid != "guest_user":
+        db.collection("users").document(uid).collection("chat_history").add({
+            "prompt": prompt,
+            "response": response_text,
+            "timestamp": firestore.SERVER_TIMESTAMP
+        })
 
-def chat_history(request):
-    return render(request, "myapp/chat_history.html", {
-        "history": request.session.get("chat_history", [])
+    return render(request, "myapp/generate.html", {
+        "response": response_text,
+        "prompt": prompt
     })
 
-def login_page(request):
-    return render(request, "myapp/login.html")
 
-def signup_page(request):
-    return render(request, "myapp/signup.html")
-
-def feedback_page(request):
-    return render(request, "myapp/feedback.html")
+@csrf_exempt
+def onboarding_page(request):
+    if request.method == "POST":
+        uid = request.POST.get("firebase_uid", "").strip()
+        ai_name = request.POST.get("ai_name", "Your AI")
+        tone = request.POST.get("tone", "neutral")
+        user_name = request.POST.get("user_name", "User")
+        about = request.POST.get("about", "a curious thinker")
+        if uid:
+            db.collection("users").document(uid).set({
+                "ai_name": ai_name,
+                "tone": tone,
+                "user_name": user_name,
+                "about": about
+            }, merge=True)
+        return redirect("generate")
+    return render(request, "myapp/onboarding.html")

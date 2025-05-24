@@ -9,48 +9,42 @@
 <body>
   <header class="site-header">
     <nav class="navbar">
-      <div class="logo">AI Project</div>
+      <div class="logo">Intelesense-- AI by SAR</div>
       <ul class="nav-links">
         <li><a href="/">Home</a></li>
         <li><a href="/generate-ai/">Generate</a></li>
         <li><a href="/chat-history/">Chat History</a></li>
         <li><a href="/feedback/">Feedback</a></li>
-        <li><a href="/login/">Login</a></li>
-        <li><a href="/signup/">Sign Up</a></li>
-
+        <li><a href="/account/">Settings</a></li>
+        <li><a href="{% url 'logout' %}">Log Out</a></li>
+        <li id="user-greeting" style="font-weight: bold; color: #90ee90;"></li>
       </ul>
-      <button id="theme-toggle" class="cta-button">🌓</button>
     </nav>
   </header>
 
   <main class="content-section narrow">
-  <h1>Log In</h1>
+    <h1>Login</h1>
+    <form method="post" id="login-form">
+      {% csrf_token %}
+      <input type="email" name="email" placeholder="Email" required>
 
-  <form method="post" id="login-form">
-    {% csrf_token %}
+      <div class="password-wrapper">
+        <input type="password" name="password" id="login-password" placeholder="Password" required>
+        <button type="button" onclick="togglePassword('login-password', this)">👁</button>
+      </div>
 
-    <input type="email" name="email" id="login-email" placeholder="Email" required>
+      <button type="submit" class="cta-button">Login</button>
+    </form>
+    <p>Don't have an account? <a href="/signup/">Sign up</a></p>
+  </main>
 
-    <div class="password-wrapper">
-      <input type="password" name="password" id="login-password" placeholder="Password" required>
-      <button type="button" onclick="togglePassword('login-password', this)">👁️</button>
-    </div>
-
-    <button type="submit" class="cta-button">Log In</button>
-  </form>
-</main>
-
-<script>
-  function togglePassword(fieldId, btn) {
-    const field = document.getElementById(fieldId);
-    field.type = field.type === "password" ? "text" : "password";
-    btn.textContent = field.type === "password" ? "👁️" : "🙈";
-  }
-</script>
-
-
-  <script src="{% static 'myapp/script.js' %}"></script>
   <script type="module" src="{% static 'myapp/firebase.js' %}"></script>
-
+  <script>
+    function togglePassword(fieldId, btn) {
+      const field = document.getElementById(fieldId);
+      field.type = field.type === "password" ? "text" : "password";
+      btn.textContent = field.type === "password" ? "👁" : "🙈";
+    }
+  </script>
 </body>
 </html>

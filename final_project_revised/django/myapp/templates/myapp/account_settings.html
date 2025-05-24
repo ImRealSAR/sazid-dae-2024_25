@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Chat History</title>
+  <title>Account Settings</title>
   <link rel="stylesheet" href="{% static 'myapp/style.css' %}">
 </head>
 <body>
@@ -17,21 +17,18 @@
         <li><a href="/feedback/">Feedback</a></li>
         <li><a href="/account/">Settings</a></li>
         <li><a href="{% url 'logout' %}">Log Out</a></li>
-        <li id="user-greeting" style="font-weight: bold; color: #90ee90;"></li>
+        <li id="user-greeting"></li>
       </ul>
     </nav>
   </header>
 
-  <main class="content-section">
-    <h1>Your Chat History</h1>
-    {% for entry in history %}
-      <div class="chat-entry">
-        <p><strong>Prompt:</strong> {{ entry.prompt }}</p>
-        <p><strong>Response:</strong> {{ entry.response }}</p>
-      </div>
-    {% empty %}
-      <p>No chat history found.</p>
-    {% endfor %}
+  <main class="content-section narrow">
+    <h1>Account Settings</h1>
+    <ul>
+      <li><a href="/onboarding/">Edit AI Preferences</a></li>
+      <li><a href="/password-reset/">Reset Password</a></li>
+      <li><a href="/logout/">Log Out</a></li>
+    </ul>
   </main>
 
   <script type="module" src="{% static 'myapp/firebase.js' %}"></script>

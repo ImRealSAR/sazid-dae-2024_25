@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "intelesense-sar",
+  "private_key_id": "7d5e647dad21b1589fa1f96e4e1e49c1b6d1fe85",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDV58eizadQW249\nITDTHLuiQ4jvUEAAZmRlUJVMBikO98Zytrbj1FXnvwXxvfgUO2j/HTdcW9cyDYLP\nXbVHHW4BG5VHVdKtZIWi+BanHCneDexOWI3kqvCvyGoOR0xO6Ac3zem96DRZdqN8\nQf4uoQdo3lrdZo7jFaW5UUN2YR5nlfhF3kepdFJV8Hl+zkUhRI/evfAnEbecnK5Y\n0j8zQG0f0qk0ZZOCclijMS2AS9lFOrinx0Mw323Jnpc4DuliNfYAoeiI3oA/xoqn\ntX0WlwD+RiWNRpcINbDa+WaRQnVeVv55Sw4IciQmB82xLjL6RUuLHTd+9MIhv8iG\nGqSCvEq1AgMBAAECggEAI5mb9utBv6S74+YgfV5Alyikw2mIgViJOHhxJJI45qIT\nr9dbeG8ILhXzfBCJF3rsxlq7Mj6hwdWQUglPSIrsGjiYP2NX+R4sBJvED2NnT2rj\nS4W+9dICVUsmZYJ1v4Mr4lx9nKrm/YW6f01va5zGwiwRlNwDB2W8q2tMLklLGWOF\nIkG9jw33rVe05q8iMT7Fzno6gEJ4JUQ2qE99ozLHNRPFyrG6pZPbdaFzoxWoY8bu\npAJED913ldd1S4IP+nKMBHaHGrocS36W1bGV6j+GDkkgOc8xBL2J/QCpQYo8KHRA\nOPzrcgh0TR6EsCiYcbEonORxdQhVKYWrCXW00kf0cQKBgQDuvVLiudsT2XsRP9D2\niz/Gac8sBm6ghb9sgUuy6v5XdSk4Ipl4OP5Is8/WR14SQNPpx5JLYj1K2aRrT4iO\n/0fDAfiVhASXt3dTeussYJ75Bv2y3jhpLRvt9zpF6CCbFFQeWvst4IgQsJEY4FEG\nIeYiBlrEOjBeyxYLG0ipv2hvMQKBgQDlXtESN/C5tJ7lxoCQQPlEe+KRWVxDkQU9\nvubC29fq3xD/ReDMt7lhwoSp4RPD5apFPtS4GtR+bi8DLoL/QXFyoRg+sXp+bNb8\nQc3i2UUnglMY9oZ/3SQnRcSmGqRrx3I+zJb+QJKWV1BlIQJusPBMIXW786zZKhuo\nuZN5/d/axQKBgQDLWmpSgzrvgm0IeVI13tCY4iG8f1IV2zb9ZnijUvUIa9yLWzVc\nKTe3l6nt/GZNp/iZhgu/uFM7AX3ChkFshFeM7I3gVU5QKM80RVwyNa7TsbfBdvWX\n6PuES/TP/PRhBATOwnJ3VmyvwqYlCVUaox9SVhVUVbhD1jrVhQz0wfxj0QKBgCuo\nQm8PSrhuEph1kd7jHw7T7anwskkB/1djUJTiN1SzJI8SA9mzVouu9IVJG/P7cM9B\nSEfKg4uU+UnHvpNLJ4bD9tNoAIKzwK++7qsw46LDgYGM2sjXlJwNAYMEKyuAiNQ/\nKLY4IC6Ra/HzuHzNHM/AxqIBnXKwOxeASvu7QLJpAoGASBIw2tF4bNgsuCQH+dqU\nIux6xHaRxoE6hxNwMpJa+zKwbAkroPZ6J5A5wDWEA/kh8aNXwCql3dyalgeyUWt6\nB0fBOOdNGZ/JAI3AtuBUurMLvSuJ4EGa9Y4vDi89ciP4txt5FdUFuBiNsmcwTcWX\nPTdppUM9jF/6ql55xArDio4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@intelesense-sar.iam.gserviceaccount.com",
+  "client_id": "113695041932341960493",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40intelesense-sar.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

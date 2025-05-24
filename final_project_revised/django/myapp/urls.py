@@ -7,7 +7,9 @@ urlpatterns = [
     path('chat-history/', views.chat_history, name='chat_history'),
     path('feedback/', views.feedback_page, name='feedback'),
     path('login/', views.login_page, name='login'),
-    path('signup/', views.signup_page, name='signup'),  # ✅ This ensures the route works
+    path('signup/', views.signup_page, name='signup'),
+    path('onboarding/', views.onboarding_page, name='onboarding'),
+    path('password-reset/', views.password_reset_request, name='password_reset'),
+    path('account/', views.settings_page, name='settings'),
+    path('logout/', views.logout_view, name='logout'),
 ]
-
-# This code defines the URL patterns for a Django application. It maps different URL paths to their corresponding view functions, allowing users to access various pages of the application. The urlpatterns list includes paths for the home page, AI generation page, chat history page, feedback page, login page, and signup page. Each path is associated with a specific view function that handles the request and response for that URL.

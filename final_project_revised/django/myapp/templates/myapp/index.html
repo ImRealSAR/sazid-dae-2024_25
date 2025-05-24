@@ -3,22 +3,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI Project | Home</title>
+  <title>Intelesense-- AI by SAR | Home</title>
   <link rel="stylesheet" href="{% static 'myapp/style.css' %}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <header class="site-header">
     <nav class="navbar">
-      <div class="logo">AI Project</div>
+      <div class="logo">Intelesense-- AI by SAR</div>
       <ul class="nav-links">
         <li><a href="/">Home</a></li>
         <li><a href="/generate-ai/">Generate</a></li>
         <li><a href="/chat-history/">Chat History</a></li>
         <li><a href="/feedback/">Feedback</a></li>
-        <li><a href="/login/">Login</a></li>
-        <li><a href="/signup/">Sign Up</a></li>
-
+        <li><a href="/onboarding/">Onboarding</a></li>
+        <li><a href="{% url 'logout' %}">Log Out</a></li>
+        <!-- ✅ only one greeting ID -->
+        <li id="user-greeting" style="font-weight: bold; color: #90ee90;"></li>
       </ul>
       <button id="theme-toggle" class="cta-button">🌓</button>
     </nav>
@@ -33,5 +34,36 @@
   </main>
 
   <script src="{% static 'myapp/script.js' %}"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFnxD9pC691dV3QFwUUFhCyRr-FZmpHaw",
+      authDomain: "intelesense-sar.firebaseapp.com",
+      projectId: "intelesense-sar",
+      storageBucket: "intelesense-sar.appspot.com",
+      messagingSenderId: "149988638839",
+      appId: "1:149988638839:web:084070ed33754a233c0672",
+      measurementId: "G-BCBF4SJXK1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      const greeting = document.getElementById("user-greeting");
+      if (user && greeting) {
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
+        const aiName = snap.exists() ? snap.data().ai_name || "Your AI" : "Your AI";
+        greeting.textContent = `Welcome, ${aiName}`;
+      } else if (greeting) {
+        greeting.innerHTML = `<a href="/login/">Login</a> / <a href="/signup/">Sign Up</a>`;
+      }
+    });
+  </script>
 </body>
 </html>

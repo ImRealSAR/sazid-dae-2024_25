@@ -6,6 +6,7 @@ import google.generativeai as genai
 import openai
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 load_dotenv()
 
 import firebase_admin
@@ -17,95 +18,83 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 
-
 def get_user_preferences(uid):
     try:
         doc = db.collection("users").document(uid).get()
         if doc.exists:
             return doc.to_dict()
-    except Exception as e:
-        print("Error fetching preferences:", e)
+    except:
+        pass
     return {
         "ai_name": "Your AI",
         "tone": "neutral",
         "user_name": "User",
-        "about": "a curious thinker"
+        "about": ""
     }
-
 
 @csrf_exempt
 def home(request):
     return render(request, "myapp/index.html")
 
-
 @csrf_exempt
 def generate_page(request):
+    chat = []
     response_text = ""
-    prompt = request.POST.get("prompt", "")
-    uid = request.POST.get("firebase_uid", "guest_user").strip()
-    model_choice = request.POST.get("model", "gemini-1.5-flash")
+    prompt = ""
 
-    prefs = get_user_preferences(uid)
-    ai_name = prefs.get("ai_name", "Your AI")
-    tone = prefs.get("tone", "neutral")
-    user_name = prefs.get("user_name", "User")
-    about = prefs.get("about", "a curious thinker")
+    if request.method == "POST":
+        prompt = request.POST.get("prompt", "").strip()
+        model_choice = request.POST.get("model", "gemini-1.5-flash")
+        uid = request.POST.get("firebase_uid", "").strip()
 
-    mentor_prompt = f"""
-You are an AI mentor named {ai_name}.
-Speak in a {tone} tone.
-You are guiding {user_name}, who is {about}.
-Make your responses thoughtful, friendly, and personal.
-Avoid giving answers directly — instead guide with insights.
-"""
+        prefs = get_user_preferences(uid if uid else "guest_user")
+        ai_name = prefs.get("ai_name", "Your AI")
+        tone = prefs.get("tone", "neutral")
+        user_name = prefs.get("user_name", "User")
+        about_user = prefs.get("about", "")
 
-    # Load recent history (limit to 3)
-    context_messages = []
-    if uid != "guest_user":
-        try:
-            chats = db.collection("users").document(uid).collection("chat_history").order_by("timestamp", direction=firestore.Query.DESCENDING).limit(3).stream()
-            for chat in reversed(list(chats)):
-                data = chat.to_dict()
-                context_messages.append({"role": "user", "content": data.get("prompt", "")})
-                context_messages.append({"role": "assistant", "content": data.get("response", "")})
-        except:
-            pass
+        # 🔁 Load last 2 messages from Firestore
+        chat_ref = db.collection("users").document(uid).collection("chat_history")
+        docs = chat_ref.order_by("timestamp", direction=firestore.Query.DESCENDING).limit(2).stream()
+        recent_context = list(reversed([doc.to_dict() for doc in docs]))
 
-    # Add current prompt to conversation
-    context_messages.append({"role": "user", "content": prompt})
-
-    if model_choice.startswith("gemini"):
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        gemini_response = model.generate_content([
-            mentor_prompt,
-            prompt
+        context_str = "\n".join([
+            f"{user_name}: {c['prompt']}\n{ai_name}: {c['response']}" for c in recent_context
         ])
-        response_text = gemini_response.text
 
-    elif model_choice.startswith("openai"):
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-        chat_response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": mentor_prompt}
-            ] + context_messages
+        system_prompt = (
+            f"You are {ai_name}, an AI who helps {user_name} (about: {about_user}) in a {tone} tone.\n\n"
+            f"{context_str}\n{user_name}: {prompt}\n{ai_name}:"
         )
-        response_text = chat_response.choices[0].message['content']
 
-    # Save conversation
-    if uid != "guest_user":
-        db.collection("users").document(uid).collection("chat_history").add({
+        try:
+            if model_choice.startswith("gemini"):
+                genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+                model = genai.GenerativeModel("gemini-1.5-flash")
+                reply = model.generate_content(system_prompt)
+                response_text = reply.text
+            elif model_choice.startswith("openai"):
+                openai.api_key = os.getenv("OPENAI_API_KEY")
+                completion = openai.ChatCompletion.create(
+                    model="gpt-4",
+                    messages=[{"role": "system", "content": system_prompt}]
+                )
+                response_text = completion.choices[0].message["content"]
+        except Exception as e:
+            response_text = "⚠️ AI error: " + str(e)
+
+        # ✅ Save new chat to Firestore
+        chat_ref.add({
             "prompt": prompt,
             "response": response_text,
-            "timestamp": firestore.SERVER_TIMESTAMP
+            "timestamp": datetime.utcnow()
         })
 
-    return render(request, "myapp/generate.html", {
-        "response": response_text,
-        "prompt": prompt
-    })
+        chat = recent_context + [{"prompt": prompt, "response": response_text}]
 
+    return render(request, "myapp/generate.html", {
+        "chat": chat
+    })
 
 @csrf_exempt
 def onboarding_page(request):
@@ -114,7 +103,7 @@ def onboarding_page(request):
         ai_name = request.POST.get("ai_name", "Your AI")
         tone = request.POST.get("tone", "neutral")
         user_name = request.POST.get("user_name", "User")
-        about = request.POST.get("about", "a curious thinker")
+        about = request.POST.get("about", "")
         if uid:
             db.collection("users").document(uid).set({
                 "ai_name": ai_name,
@@ -124,3 +113,36 @@ def onboarding_page(request):
             }, merge=True)
         return redirect("generate")
     return render(request, "myapp/onboarding.html")
+
+@csrf_exempt
+def password_reset_request(request):
+    if request.method == "POST":
+        email = request.POST.get("email", "").strip()
+        try:
+            reset_link = auth.generate_password_reset_link(email)
+            send_mail("Password Reset", f"Click to reset: {reset_link}", settings.DEFAULT_FROM_EMAIL, [email])
+            return render(request, "myapp/password_reset.html", {"message": "Reset email sent!"})
+        except:
+            return render(request, "myapp/password_reset.html", {"error": "Failed to send reset link."})
+    return render(request, "myapp/password_reset.html")
+
+def settings_page(request):
+    return render(request, "myapp/account_settings.html")
+
+def login_page(request):
+    return render(request, "myapp/login.html")
+
+def signup_page(request):
+    return render(request, "myapp/signup.html")
+
+def chat_history(request):
+    return render(request, "myapp/chat_history.html", {
+        "history": request.session.get("chat_history", [])
+    })
+
+def feedback_page(request):
+    return render(request, "myapp/feedback.html")
+
+def logout_view(request):
+    request.session.flush()
+    return redirect("home")
